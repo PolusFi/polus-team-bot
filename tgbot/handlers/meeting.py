@@ -17,6 +17,8 @@ db.create()
 
 async def user_meeting_checkin_pm(callback_query: CallbackQuery, callback_data: dict, state: FSMContext):
 
+    # TODO : If user already submitted -> hide buttons or else ...
+
     meeting_doc = db.getDoc(database='polus',
                             collection='meetings',
                             search={"status": True, "_id": ObjectId(callback_data.get('value'))})
@@ -72,7 +74,7 @@ async def user_meeting_absence_pm(message: Message, state: FSMContext):
 
     await state.finish()
     await message.bot.edit_message_text(
-        text=f'Спасибо что сообщили, в этот раз обойдемся без увольнения, но впредь будте аккуратнее!',
+        text=f'Спасибо что сообщили, в этот раз обойдемся без увольнения, но впредь будьте аккуратнее!',
         chat_id=message.from_user.id,
         message_id=message.message_id - 1
     )
