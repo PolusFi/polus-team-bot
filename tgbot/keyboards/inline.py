@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeybo
 from aiogram.utils.callback_data import CallbackData
 
 from tgbot.filters.user import start_join_callback, start_org_member, default_user_callback, meeting_callback
-from tgbot.filters.admin import admin_action_callback
+from tgbot.filters.admin import admin_action_callback, admin_back_callback
 
 from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 
@@ -37,6 +37,7 @@ def meeting_notify(meetings: list):
         ))
     return kbd
 
+
 def meeting_members(members: list):
     kbd = InlineKeyboardMarkup()
     for i in range(0, len(members), 2):
@@ -58,8 +59,61 @@ def meeting_members(members: list):
                     callback_data=str(members[i]['telegram_id'])
                 )
             )
+    if len(members) != 0:
+        kbd.add(InlineKeyboardButton(text=f"All", callback_data='All'))
     kbd.add(InlineKeyboardButton(text=f"End", callback_data='0'))
     return kbd
+
+
+def admin_start():
+    kbd = InlineKeyboardMarkup()
+    kbd.row(
+        InlineKeyboardButton(
+            text=f"Add meeting",
+            callback_data=admin_action_callback.new(action="add_meeting", value="0")
+        ),
+        InlineKeyboardButton(
+            text=f"Meetings",
+            callback_data=admin_action_callback.new(action="all_meetings", value="0")
+        )
+    )
+    return kbd
+
+
+def admin_meetings(meetings: list):
+    kbd = InlineKeyboardMarkup()
+    for meeting in meetings[0:10]:
+        kbd.add(
+            InlineKeyboardButton(
+                text=f"{meeting['name']} ({meeting['date'].strftime('%d/%m/%Y')})",
+                callback_data=admin_action_callback.new(action="meeting", value=meeting['_id'])
+            )
+        )
+    kbd.add(InlineKeyboardButton(
+                text=f"◀️ Back",
+                callback_data=admin_back_callback.new(location="start", value="0")
+            ))
+    return kbd
+
+
+def admin_meeting(meeting: dict):
+    kbd = InlineKeyboardMarkup()
+    kbd.add(InlineKeyboardButton(
+        text="Оповестить участников",
+        callback_data=admin_action_callback.new(action="notify_group", value=meeting['_id'])
+    ))
+    kbd.add(
+        InlineKeyboardButton(
+            text=f"Завершить",
+            callback_data=admin_action_callback.new(action="end_meeting", value=meeting['_id'])
+        )
+    )
+    kbd.add(InlineKeyboardButton(
+        text=f"◀️ Back",
+        callback_data=admin_action_callback.new(action="all_meetings", value="0")
+    ))
+    return kbd
+
 
 def admin_org_request(telegram_id: str):
     kbd = InlineKeyboardMarkup()
