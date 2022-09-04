@@ -3,7 +3,7 @@
 from tgbot.config import load_config
 
 # from asyncpg.pool import Pool
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING, DESCENDING
 
 db_conf = load_config().db
 
@@ -16,6 +16,7 @@ class Database:
     def create(self):
         self.pool = MongoClient('localhost', 27017)
 
+
     def addDoc(self, database: str, collection: str, document: dict or list[dict]):
         if type(document) == dict:
             res = self.pool[database][collection].insert_one(document).inserted_id
@@ -23,8 +24,15 @@ class Database:
             res = self.pool[database][collection].insert_many(document).inserted_ids
         return res
 
-    def getDocs(self, database: str, collection: str, search: dict):
-        return list(self.pool[database][collection].find(search))
+    def getDocs(self, database: str, collection: str, search: dict, order_by: dict = {'_id': 1}):
+
+        # order_by = {'field1': 1, 'field2': 0}
+        # sort_by = [('field1', ASCENDING), ('field2', DESCENDING)]
+
+        sort_by = [(field, ASCENDING) if val == 1 else (field, DESCENDING) for field, val in order_by.items()]
+
+        return list(self.pool[database][collection].find(search).sort(sort_by))
+
     def getDoc(self, database: str, collection: str, search: dict):
         return self.pool[database][collection].find_one(search)
 
