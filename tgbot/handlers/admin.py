@@ -7,7 +7,7 @@ from aiogram.dispatcher import FSMContext
 from bson import ObjectId
 
 from tgbot.filters.user import start_join_callback
-from tgbot.filters.admin import admin_action_callback
+from tgbot.filters.admin import admin_action_callback, admin_back_callback
 from tgbot.models.db import Database
 from tgbot.states.admin import MeetingStatesGroup
 import tgbot.keyboards as keyboards
@@ -22,7 +22,43 @@ vote_cb = CallbackData('vote', 'action', 'value')  # post:<action>:<amount>
 
 async def admin_start(message: Message):
     print(message)
-    await message.reply("Hello, admin!")
+    await message.reply(text="Hello, admin!", reply_markup=keyboards.inline.admin_start())
+
+
+async def admin_meetings(callback_query: CallbackQuery, callback_data: dict):
+    meeting_docs = db.getDocs(database='polus', collection='meetings', search={}, order_by={'date': 0})
+    await callback_query.message.edit_text("Recent POLUS team meetings")
+    await callback_query.message.edit_reply_markup(keyboards.inline.admin_meetings(meeting_docs))
+
+
+async def admin_meeting(callback_query: CallbackQuery, callback_data: dict):
+    meeting_doc = db.getDoc(database='polus',
+                            collection='meetings',
+                            search={
+                                '_id': ObjectId(callback_data.get('value'))
+                            })
+
+    members, absent = [], ""
+    for member in db.getDocs(database='polus', collection='user',
+                             search={"telegram_id": {"$in": meeting_doc['members']}}):
+        members.append(f'@{member["username"]} ' + (
+            '❌' if member['telegram_id'] in meeting_doc['absent'].keys() else '✅'
+        ))
+        if member['telegram_id'] in meeting_doc['absent'].keys():
+            absent += f'@{member["username"]} - "{meeting_doc["absent"][member["telegram_id"]]}"\n'
+    members = "\n".join(members)
+
+    message = f'📄 Name: {meeting_doc["name"]}\n\n' \
+              f'📈 Object: {meeting_doc["goal"]}\n\n' \
+              f'📆 Date: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
+              f'⏰ Time: {meeting_doc["time"]}\n' \
+              f'⚜️ Status: {"Not started" if meeting_doc["status"] else "Ended"}\n\n' \
+              f'👥 Members: \n{members}\n\n' \
+              f'❗️ Absent: \n{absent}'
+
+    await callback_query.message.edit_text(message)
+    await callback_query.message.edit_reply_markup(keyboards.inline.admin_meeting(meeting_doc))
+
 
 async def admin_meeting_notify_list(message: Message):
     meetings_list = db.getDocs(database='polus', collection='meetings', search={"status": True})
@@ -81,13 +117,19 @@ async def admin_notify_group(callback_query: CallbackQuery, callback_data: dict)
     msg = await callback_query.bot.send_message(chat_id=callback_query.bot['config'].tg_bot.dev_chat,
                                                 text=meeting,
                                                 reply_markup=keyboards.inline.meeting_checkin(meeting_doc))
+    meeting_doc['pinned_msg_id'] = msg.message_id
+    db.updateDoc(database='polus',
+                 collection='meetings',
+                 search={'_id': meeting_doc['_id']},
+                 update_doc=meeting_doc)
+
     await callback_query.bot.pin_chat_message(chat_id=callback_query.bot['config'].tg_bot.dev_chat,
                                               message_id=msg.message_id)
 
 
-async def admin_add_meeting(message: Message):
+async def admin_add_meeting(callback_query: CallbackQuery, callback_data: dict, state: FSMContext):
     await MeetingStatesGroup.name.set()
-    await message.answer('✏️ Enter name of meeting')
+    await callback_query.message.answer('✏️ Enter name of meeting')
 
 
 async def admin_meeting_name(message: Message, state: FSMContext):
@@ -98,6 +140,7 @@ async def admin_meeting_name(message: Message, state: FSMContext):
             text='📆 Select date of meeting',
             reply_markup=await SimpleCalendar().start_calendar()
         )
+
 
 async def admin_meeting_time(message: Message, state: FSMContext):
     async with state.proxy() as data:
@@ -110,7 +153,9 @@ async def admin_meeting_time(message: Message, state: FSMContext):
             f'✏️ Whats the object of meeting?'
         )
 
+
 async def admin_meeting_goal(message: Message, state: FSMContext):
+
     async with state.proxy() as data:
         data['goal'] = message.text
         await MeetingStatesGroup.member.set()
@@ -139,36 +184,48 @@ async def admin_meeting_goal(message: Message, state: FSMContext):
         }
         data['id'] = db.addDoc(database='polus', collection='meetings', document=meeting_doc)
 
+
 async def admin_meeting_member(callback_query: CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
-        if callback_query.data != '0':
-            meeting_doc = db.getDoc(database='polus', collection='meetings', search={'_id': data['id']})
-            meeting_doc['members'].append(callback_query.data)
-            db.updateDoc(database='polus', collection='meetings', search={'_id': data['id']}, update_doc=meeting_doc)
+        meeting_doc = db.getDoc(database='polus', collection='meetings', search={'_id': data['id']})
 
-            members = []
-            for member in db.getDocs(database='polus', collection='user',
-                                     search={"telegram_id": {"$in": meeting_doc['members']}}):
-                members.append(f'@{member["username"]}')
-            members = "\n".join(members)
-
-            await data['message'].edit_text(
-                f'📄 Name: {data["name"]}\n\n'
-                f'📈 Object: {data["goal"]}\n\n'
-                f'📆 Date: {data["date"]}\n'
-                f'⏰ Time: {data["time"]}\n\n'
-                f'👥 Members: {members}'
-            )
-            await data['message'].edit_reply_markup(
-                keyboards.inline.meeting_members(
-                    db.getDocs(database='polus', collection='user', search={
+        if callback_query.data == 'All':
+            for user in db.getDocs(database='polus', collection='user', search={
                         "telegram_id": {"$nin": meeting_doc['members']}
-                    })
-                )
-            )
+                    }):
+
+                meeting_doc['members'].append(str(user['telegram_id']))
+        elif callback_query.data != '0':
+            meeting_doc['members'].append(callback_query.data)
         else:
             await state.finish()
-            await data['message'].edit_reply_markup(keyboards.inline.remove_keyboard())
+            await data['message'].edit_reply_markup(keyboards.inline.admin_meeting(meeting_doc))
+            return
+
+        db.updateDoc(database='polus', collection='meetings', search={'_id': data['id']}, update_doc=meeting_doc)
+
+        members = []
+
+        for member in db.getDocs(database='polus', collection='user',
+                                 search={"telegram_id": {"$in": meeting_doc['members']}}):
+            members.append(f'@{member["username"]}')
+        members = "\n".join(members)
+
+        await data['message'].edit_text(
+            f'📄 Name: {data["name"]}\n\n'
+            f'📈 Object: {data["goal"]}\n\n'
+            f'📆 Date: {data["date"]}\n'
+            f'⏰ Time: {data["time"]}\n\n'
+            f'👥 Members: {members}'
+        )
+        await data['message'].edit_reply_markup(
+            keyboards.inline.meeting_members(
+                db.getDocs(database='polus', collection='user', search={
+                    "telegram_id": {"$nin": meeting_doc['members']}
+                })
+            )
+        )
+
 
 async def admin_org_join_request(callback_query: CallbackQuery, callback_data: dict):
     user_doc = db.getDoc(database='polus', collection='user', search={'telegram_id': callback_data.get("user")})
@@ -199,14 +256,23 @@ async def process_admin_calendar(callback_query: CallbackQuery, callback_data: d
             )
 
 
+async def admin_back(callback_query: CallbackQuery, callback_data: dict, state: FSMContext):
+    if callback_data.get('location') == "start":
+        await callback_query.message.edit_text("Hello, admin!")
+        await callback_query.message.edit_reply_markup(keyboards.inline.admin_start())
+
+
 def register_admin(dp: Dispatcher):
     dp.register_message_handler(admin_start, commands=["start"], state="*", is_admin=True)
+    dp.register_callback_query_handler(admin_back, admin_back_callback.filter(), is_admin=True)
     dp.register_message_handler(admin_meeting_notify_list, commands=["meetings"], is_admin=True)
     #dp.register_message_handler(admin_migrate_db, commands=['migrate'], is_admin=True)
-    dp.register_message_handler(admin_add_meeting, commands=['add_meeting'], is_admin=True)
     dp.register_message_handler(admin_meeting_name, state=MeetingStatesGroup.name, is_admin=True)
     dp.register_message_handler(admin_meeting_time, state=MeetingStatesGroup.time, is_admin=True)
     dp.register_message_handler(admin_meeting_goal, state=MeetingStatesGroup.goal, is_admin=True)
+    dp.register_callback_query_handler(admin_add_meeting, admin_action_callback.filter(action="add_meeting"), is_admin=True)
+    dp.register_callback_query_handler(admin_meetings, admin_action_callback.filter(action="all_meetings"), is_admin=True)
+    dp.register_callback_query_handler(admin_meeting, admin_action_callback.filter(action="meeting"), is_admin=True)
     dp.register_callback_query_handler(admin_notify_group, admin_action_callback.filter(action="notify_group"), is_admin=True)
     dp.register_callback_query_handler(admin_org_join_request, start_join_callback.filter(), is_admin=True)
     dp.register_callback_query_handler(admin_meeting_member, state=MeetingStatesGroup.member, is_admin=True)
