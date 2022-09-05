@@ -42,8 +42,11 @@ async def admin_meeting(callback_query: CallbackQuery, callback_data: dict):
     for member in db.getDocs(database='polus', collection='user',
                              search={"telegram_id": {"$in": meeting_doc['members']}}):
         members.append(f'@{member["username"]} ' + (
-            '❌' if member['telegram_id'] in meeting_doc['absent'].keys() else '✅'
-        ))
+                '✅' if member['telegram_id'] in meeting_doc['checkin'] else (
+                    '❌' if member['telegram_id'] in meeting_doc['absent'].keys() else '➖'
+                )
+            )
+        )
         if member['telegram_id'] in meeting_doc['absent'].keys():
             absent += f'@{member["username"]} - "{meeting_doc["absent"][member["telegram_id"]]}"\n'
     members = "\n".join(members)
@@ -80,6 +83,7 @@ async def admin_meeting_notify_list(message: Message):
                     f'------------------------------\n\n'
     await message.reply(meetings, reply_markup=keyboards.inline.meeting_notify(meetings_list))
 
+
 async def admin_notify_group(callback_query: CallbackQuery, callback_data: dict):
     meeting_doc = db.getDoc(database='polus',
                             collection='meetings',
@@ -91,7 +95,13 @@ async def admin_notify_group(callback_query: CallbackQuery, callback_data: dict)
     members = []
     for member in db.getDocs(database='polus', collection='user',
                              search={"telegram_id": {"$in": meeting_doc['members']}}):
-        members.append(f'@{member["username"]}')
+        members.append(
+            f'@{member["username"]} ' + (
+                '✅' if member['telegram_id'] in meeting_doc['checkin'] else (
+                    '❌' if member['telegram_id'] in meeting_doc['absent'].keys() else '➖'
+                )
+            )
+        )
 
         remind_msg = f'❗️ {member["name"]}, скоро состоится мит с вашим участием, забудьте прийти!\n\n' \
                      f'📄 Мит: {meeting_doc["name"]}\n\n' \
@@ -111,8 +121,7 @@ async def admin_notify_group(callback_query: CallbackQuery, callback_data: dict)
               f'📈 Object: {meeting_doc["goal"]}\n\n' \
               f'📆 Date: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
               f'⏰ Time: {meeting_doc["time"]}\n\n' \
-              f'👥 Members: \n{members}\n\n' \
-              f'✅ Checkin\n'
+              f'👥 Members: \n{members}'
 
     msg = await callback_query.bot.send_message(chat_id=callback_query.bot['config'].tg_bot.dev_chat,
                                                 text=meeting,
