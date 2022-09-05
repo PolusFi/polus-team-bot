@@ -16,14 +16,40 @@ db = Database()
 db.create()
 
 
+def format_meeting_text(meeting_doc: dict):
+    members = []
+    for member in db.getDocs(
+            database='polus',
+            collection='user',
+            search={"telegram_id": {"$in": meeting_doc['members']}}
+    ):
+        members.append(
+            f'@{member["username"]} ' + (
+                '✅' if member['telegram_id'] in meeting_doc['checkin'] else (
+                    '❌' if member['telegram_id'] in meeting_doc['absent'].keys() else '➖'
+                )
+            )
+        )
+
+    members = "\n".join(members)
+
+    meeting = f'📄 Name: {meeting_doc["name"]}\n\n' \
+              f'📈 Object: {meeting_doc["goal"]}\n\n' \
+              f'📆 Date: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
+              f'⏰ Time: {meeting_doc["time"]}\n\n' \
+              f'👥 Members: \n{members}'
+
+    return meeting
+
+
 async def user_meeting_checkin_pm(callback_query: CallbackQuery, callback_data: dict, state: FSMContext):
 
     meeting_doc = db.getDoc(database='polus',
                             collection='meetings',
                             search={"status": True, "_id": ObjectId(callback_data.get('value'))})
     
-    if str(callback_query.from_user.id) not in meeting_doc['checkin'] or str(callback_query.from_user.id) \
-            not in meeting_doc['absent'].keys():
+    if str(callback_query.from_user.id) not in meeting_doc['checkin'] and \
+       str(callback_query.from_user.id) not in meeting_doc['absent'].keys():
 
         if callback_data.get('action') == 'dis_checkin':
 
@@ -31,37 +57,74 @@ async def user_meeting_checkin_pm(callback_query: CallbackQuery, callback_data: 
             async with state.proxy() as data:
                 data['meeting_id'] = callback_data.get('value')
 
-            await callback_query.bot.send_message(chat_id=callback_query.from_user.id,
-                                                  text=f'✏️ Опишите причину вашего отсутствия',
-                                                  reply_markup=keyboards.inline.user_cancel("meeting_absence"))
+            await callback_query.bot.send_message(
+                chat_id=callback_query.from_user.id,
+                text=f'✏️ Опишите причину вашего отсутствия',
+                reply_markup=keyboards.inline.user_cancel("meeting_absence")
+            )
 
         elif callback_data.get('action') == 'checkin':
 
             meeting_doc['checkin'].append(str(callback_query.from_user.id))
 
-            await callback_query.bot.send_message(chat_id=callback_query.from_user.id,
-                                                  text=f'✅ Отлично, до встречи на митапе!')
+            await callback_query.bot.send_message(
+                chat_id=callback_query.from_user.id,
+                text=f'✅ Отлично, до встречи на митапе!'
+            )
             await callback_query.message.edit_reply_markup(keyboards.inline.remove_keyboard())
 
-        db.updateDoc(database='polus', collection='meetings', search={'_id': meeting_doc['_id']}, update_doc=meeting_doc)
+        db.updateDoc(
+            database='polus',
+            collection='meetings',
+            search={'_id': meeting_doc['_id']},
+            update_doc=meeting_doc
+        )
+
+        try:
+            meeting_text = format_meeting_text(meeting_doc=meeting_doc)
+            await callback_query.bot.edit_message_text(
+                text=meeting_text,
+                chat_id=callback_query.bot['config'].tg_bot.dev_chat,
+                message_id=meeting_doc['pinned_msg_id'],
+                reply_markup=keyboards.inline.meeting_checkin(meeting_doc)
+            )
+        except(Exception) as e:
+            print(e)
+
     else:
         await callback_query.message.edit_reply_markup(keyboards.inline.remove_keyboard())
 
 
 async def user_meeting_checkin(callback_query: CallbackQuery, callback_data: dict):
-    meeting_doc = db.getDoc(database='polus',
-                            collection='meetings',
-                            search={"status": True, "_id": ObjectId(callback_data.get('value'))})
+    meeting_doc = db.getDoc(
+        database='polus',
+        collection='meetings',
+        search={
+            "status": True,
+            "_id": ObjectId(callback_data.get('value'))
+        }
+    )
 
-    if meeting_doc and str(callback_query.from_user.id) not in meeting_doc['checkin'] and \
+    if meeting_doc and \
+       str(callback_query.from_user.id) not in meeting_doc['checkin'] and \
        str(callback_query.from_user.id) in meeting_doc['members']:
 
         meeting_doc['checkin'].append(str(callback_query.from_user.id))
-        text = callback_query.message.text + f'\n@{callback_query.from_user.username}'
-        db.updateDoc(database='polus', collection='meetings', search={'_id': meeting_doc['_id']}, update_doc=meeting_doc)
+        db.updateDoc(
+            database='polus',
+            collection='meetings',
+            search={'_id': meeting_doc['_id']},
+            update_doc=meeting_doc
+        )
 
-        await callback_query.message.edit_text(text)
+    try:
+        meeting = format_meeting_text(meeting_doc=meeting_doc)
+
+        await callback_query.message.edit_text(meeting)
         await callback_query.message.edit_reply_markup(keyboards.inline.meeting_checkin(meeting_doc))
+    except(Exception) as e:
+        print(e)
+
     await callback_query.answer(show_alert=True)
 
 
@@ -88,12 +151,16 @@ async def user_meeting_absence_pm(message: Message, state: FSMContext):
 
 async def end_meeting(callback_query: CallbackQuery, callback_data: dict):
 
-    meeting_doc = db.getDoc(database='polus',
-                            collection='meetings',
-                            search={
-                                '_id': ObjectId(callback_data.get('value'))
-                            })
+    meeting_doc = db.getDoc(
+        database='polus',
+        collection='meetings',
+        search={
+            '_id': ObjectId(callback_data.get('value'))
+        }
+
+    )
     meeting_doc['status'] = False
+
     db.updateDoc(database='polus',
                  collection='meetings',
                  search={'_id': ObjectId(callback_data.get('value'))},
