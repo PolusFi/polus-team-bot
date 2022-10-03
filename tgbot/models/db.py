@@ -14,8 +14,7 @@ class Database:
         self.pool: MongoClient = None
 
     def create(self):
-        self.pool = MongoClient('localhost', 27017)
-
+        self.pool = MongoClient(db_conf.mongo)
 
     def addDoc(self, database: str, collection: str, document: dict or list[dict]):
         if type(document) == dict:

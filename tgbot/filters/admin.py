@@ -8,6 +8,7 @@ from tgbot.config import Config
 admin_action_callback = CallbackData("admin", "action", "value")
 admin_back_callback = CallbackData("admin_back", "location", "value")
 
+
 class AdminFilter(BoundFilter):
     key = 'is_admin'
 

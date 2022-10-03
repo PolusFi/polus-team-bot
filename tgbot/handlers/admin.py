@@ -17,11 +17,8 @@ from aiogram_calendar import simple_cal_callback, SimpleCalendar, dialog_cal_cal
 db = Database()
 db.create()
 
-vote_cb = CallbackData('vote', 'action', 'value')  # post:<action>:<amount>
-
 
 async def admin_start(message: Message):
-    print(message)
     await message.reply(text="Hello, admin!", reply_markup=keyboards.inline.admin_start())
 
 
@@ -103,7 +100,7 @@ async def admin_notify_group(callback_query: CallbackQuery, callback_data: dict)
             )
         )
 
-        remind_msg = f'❗️ {member["name"]}, скоро состоится мит с вашим участием, забудьте прийти!\n\n' \
+        remind_msg = f'❗️ {member["name"]}, скоро состоится мит с вашим участием, <strong>не</strong> забудьте прийти!\n\n' \
                      f'📄 Мит: {meeting_doc["name"]}\n\n' \
                      f'📈 Цель: {meeting_doc["goal"]}\n\n' \
                      f'📆 Дата: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
@@ -252,6 +249,67 @@ async def admin_org_join_request(callback_query: CallbackQuery, callback_data: d
         print(e)
 
 
+async def admin_projects(callback_query: CallbackQuery, callback_data: dict):
+    project_docs = db.getDocs(
+        database='polus',
+        collection='projects',
+        search={
+            "status": {"$in": ["working", "not_started"]}
+        },
+        order_by={'deadline': 0}
+    )
+    projects = "<strong>POLUS projects</strong>\n\n"
+
+    for project in project_docs:
+        workers = ""
+        for user in project['developers']:
+            dev = db.getDoc(database='polus', collection='user', search={'telegram_id': user['id']})
+            workers += f"\n@{dev['username']} - {user['task']} " + ("✅" if user['status'] else "❌")
+        projects += f"<strong>Name</strong>: {project['name']}\n" \
+                    f"<strong>Softline</strong>: {project['softline'].strftime('%d/%m/%Y')}\n" \
+                    f"<strong>Deadline</strong>: {project['deadline'].strftime('%d/%m/%Y')}\n" \
+                    f"<strong>Status</strong>: {project['status']}\n" \
+                    f"<strong>Developers</strong>: {workers}\n\n"
+    await callback_query.message.edit_text(projects)
+    await callback_query.message.edit_reply_markup(keyboards.inline.admin_projects(project_docs))
+
+
+async def admin_members(callback_query: CallbackQuery, callback_data: dict):
+    message = "POLUS DEVELOPERS\n\n"
+    user_docs = db.getDocs(
+        database='polus',
+        collection='user',
+        search={
+            "status": "member"
+        },
+        order_by={'deadline': 0}
+    )
+    for user in user_docs:
+        user_tasks = db.getDocs(
+            database='polus',
+            collection='tasks',
+            search={
+                "active": True,
+                "worker": user['telegram_id']
+            },
+            order_by={'deadline': 0}
+        )
+        message += f"@{user['username']}\n"
+        for task in user_tasks:
+            message += f"{'🟢' if task['status'] else '🔴'} - " \
+                       f"<strong>{task['code']} {task['name']}</strong> - " \
+                       f"<code>{task['deadline'].strftime('%d/%m/%Y')}</code>\n"
+        message += f"--------------------\n"
+
+    await callback_query.message.edit_text(
+        message,
+        reply_markup=keyboards.inline.admin_back(location="start")
+    )
+
+
+# async def admin_add_project(callback_query: CallbackQuery, callback_data: dict):
+
+
 async def process_admin_calendar(callback_query: CallbackQuery, callback_data: dict, state: FSMContext):
     selected, date = await SimpleCalendar().process_selection(callback_query, callback_data)
     if selected:
@@ -279,6 +337,8 @@ def register_admin(dp: Dispatcher):
     dp.register_message_handler(admin_meeting_name, state=MeetingStatesGroup.name, is_admin=True)
     dp.register_message_handler(admin_meeting_time, state=MeetingStatesGroup.time, is_admin=True)
     dp.register_message_handler(admin_meeting_goal, state=MeetingStatesGroup.goal, is_admin=True)
+    dp.register_callback_query_handler(admin_projects, admin_action_callback.filter(action="projects"), is_admin=True)
+    dp.register_callback_query_handler(admin_members, admin_action_callback.filter(action="members"), is_admin=True)
     dp.register_callback_query_handler(admin_add_meeting, admin_action_callback.filter(action="add_meeting"), is_admin=True)
     dp.register_callback_query_handler(admin_meetings, admin_action_callback.filter(action="all_meetings"), is_admin=True)
     dp.register_callback_query_handler(admin_meeting, admin_action_callback.filter(action="meeting"), is_admin=True)

@@ -23,6 +23,7 @@ async def user_start_pm(message: Message):
         search={
             'telegram_id': str(message.from_user.id)
         })
+
     if len(check_user) == 0:
         user = {
             'telegram_id': str(message.from_user.id),
@@ -36,6 +37,7 @@ async def user_start_pm(message: Message):
     else:
         reply_message = f'Привет, {message.from_user.first_name}!\n\n' \
                         f'Выбери одну из опций в меню...'
+
     user_doc = db.getDoc(database='polus', collection='user', search={'telegram_id': str(message.from_user.id)})
     await message.answer(reply_message, reply_markup=keyboards.inline.user_start(user_doc))
 

@@ -9,6 +9,7 @@ class DbConfig:
     password: str
     user: str
     database: str
+    mongo: str
 
 
 @dataclass
@@ -17,6 +18,7 @@ class TgBot:
     admin_ids: list[int]
     use_redis: bool
     dev_chat: str
+    test_chat: str
 
 
 @dataclass
@@ -40,13 +42,15 @@ def load_config(path: str = None):
             token=env.str("BOT_TOKEN"),
             admin_ids=list(map(int, env.list("ADMINS"))),
             use_redis=env.bool("USE_REDIS"),
-            dev_chat=env.str("DEV_CHAT_ID")
+            dev_chat=env.str("DEV_CHAT_ID"),
+            test_chat=env.str("TEST_CHAT_ID")
         ),
         db=DbConfig(
             host=env.str('DB_HOST'),
             password=env.str('DB_PASS'),
             user=env.str('DB_USER'),
-            database=env.str('DB_NAME')
+            database=env.str('DB_NAME'),
+            mongo=env.str('MONGO_CONNECTION_STRING')
         ),
         misc=Miscellaneous()
     )

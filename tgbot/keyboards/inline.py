@@ -8,6 +8,7 @@ from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 
 vote_cb = CallbackData('vote', 'action', 'value')  # post:<action>:<value>
 
+
 def meeting_checkin(meeting: dict):
     kbd = InlineKeyboardMarkup()
     kbd.add(InlineKeyboardButton(
@@ -15,6 +16,7 @@ def meeting_checkin(meeting: dict):
         callback_data=meeting_callback.new(action="checkin", value=meeting['_id'])
     ))
     return kbd
+
 
 def meeting_checkin_pm(meeting: dict):
     kbd = InlineKeyboardMarkup()
@@ -27,6 +29,7 @@ def meeting_checkin_pm(meeting: dict):
         callback_data=meeting_callback.new(action="dis_checkin", value=meeting['_id'])
     ))
     return kbd
+
 
 def meeting_notify(meetings: list):
     kbd = InlineKeyboardMarkup()
@@ -77,6 +80,18 @@ def admin_start():
             callback_data=admin_action_callback.new(action="all_meetings", value="0")
         )
     )
+    kbd.add(
+        InlineKeyboardButton(
+            text=f"Projects",
+            callback_data=admin_action_callback.new(action="projects", value="0")
+        )
+    )
+    kbd.add(
+        InlineKeyboardButton(
+            text=f"Developers",
+            callback_data=admin_action_callback.new(action="members", value="0")
+        )
+    )
     return kbd
 
 
@@ -87,6 +102,22 @@ def admin_meetings(meetings: list):
             InlineKeyboardButton(
                 text=f"{meeting['name']} ({meeting['date'].strftime('%d/%m/%Y')})",
                 callback_data=admin_action_callback.new(action="meeting", value=meeting['_id'])
+            )
+        )
+    kbd.add(InlineKeyboardButton(
+                text=f"◀️ Back",
+                callback_data=admin_back_callback.new(location="start", value="0")
+            ))
+    return kbd
+
+
+def admin_projects(projects: list):
+    kbd = InlineKeyboardMarkup()
+    for project in projects[0:11]:
+        kbd.add(
+            InlineKeyboardButton(
+                text=f"{project['name']} ({project['deadline'].strftime('%d/%m/%Y')})",
+                callback_data=admin_action_callback.new(action="project", value=project['_id'])
             )
         )
     kbd.add(InlineKeyboardButton(
@@ -112,6 +143,15 @@ def admin_meeting(meeting: dict):
         text=f"◀️ Back",
         callback_data=admin_action_callback.new(action="all_meetings", value="0")
     ))
+    return kbd
+
+
+def admin_back(location: str):
+    kbd = InlineKeyboardMarkup()
+    kbd.add(InlineKeyboardButton(
+            text=f"◀️ Back",
+            callback_data=admin_back_callback.new(location=location, value="0")
+            ))
     return kbd
 
 

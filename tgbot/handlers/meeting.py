@@ -93,6 +93,7 @@ async def user_meeting_checkin_pm(callback_query: CallbackQuery, callback_data: 
 
     else:
         await callback_query.message.edit_reply_markup(keyboards.inline.remove_keyboard())
+    await callback_query.answer(show_alert=True)
 
 
 async def user_meeting_checkin(callback_query: CallbackQuery, callback_data: dict):

@@ -18,8 +18,8 @@ async def group_meetings(query: InlineQuery):
                              'status': {'$in': ['member', 'founder', 'owner', 'admin']}
                          })
     if user_doc != None:
-        meetings = "📅 БЛИЖАЙШИЕ ТИМ МИТЫ POLUS 📅\n\n"
-        my_meetings = "📅 МОИ БЛИЖАЙШИЕ МИТЫ POLUS 📅\n\n"
+        meetings = "📅 <strong>Ближайшие сходки подписчиков POLUS</strong> 📅\n\n"
+        my_meetings = "📅 <strong>Мои сходки POLUS</strong> 📅\n\n"
         for meeting in db.getDocs(database='polus', collection='meetings', search={"status": True}):
             members = []
             for member in db.getDocs(database='polus', collection='user',
