@@ -29,6 +29,7 @@ async def jira_hook():
     if request.headers.get('Action') == "new-task":
         await add_task(polus_team_bot.bot, request.json)
     elif request.headers.get('Action') == "started-task":
+        await add_task(polus_team_bot.bot, request.json)
         await start_task(polus_team_bot.bot, request.json)
     elif request.headers.get('Action') == "end-task":
         await end_task(polus_team_bot.bot, request.json)
