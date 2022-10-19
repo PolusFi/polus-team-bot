@@ -3,7 +3,7 @@ import asyncio
 from flask import request, Response
 from app import app
 from aiogram import types, Dispatcher, Bot
-import botwebhok as polus_team_bot
+import botwebhook as polus_team_bot
 
 from tgbot.handlers.jira import add_task, start_task, end_task
 
