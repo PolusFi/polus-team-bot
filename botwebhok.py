@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 config = load_config(".env")
 
 WEBHOOK_PATH = f"/bot/{config.tg_bot.token}"
-WEBHOOK_URL = "https://82d2-31-131-78-130.eu.ngrok.io" + WEBHOOK_PATH
+WEBHOOK_URL = config.tg_bot.webhook_url + WEBHOOK_PATH
 
 
 def register_all_middlewares(dp, config):

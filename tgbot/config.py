@@ -19,6 +19,7 @@ class TgBot:
     use_redis: bool
     dev_chat: str
     test_chat: str
+    webhook_url: str
 
 
 @dataclass
@@ -43,7 +44,8 @@ def load_config(path: str = None):
             admin_ids=list(map(int, env.list("ADMINS"))),
             use_redis=env.bool("USE_REDIS"),
             dev_chat=env.str("DEV_CHAT_ID"),
-            test_chat=env.str("TEST_CHAT_ID")
+            test_chat=env.str("TEST_CHAT_ID"),
+            webhook_url=env.str("WEBHOOK_URL")
         ),
         db=DbConfig(
             host=env.str('DB_HOST'),

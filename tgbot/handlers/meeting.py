@@ -48,7 +48,7 @@ async def user_meeting_checkin_pm(callback_query: CallbackQuery, callback_data: 
                             collection='meetings',
                             search={"status": True, "_id": ObjectId(callback_data.get('value'))})
     
-    if str(callback_query.from_user.id) not in meeting_doc['checkin'] and \
+    if meeting_doc and str(callback_query.from_user.id) not in meeting_doc['checkin'] and \
        str(callback_query.from_user.id) not in meeting_doc['absent'].keys():
 
         if callback_data.get('action') == 'dis_checkin':
