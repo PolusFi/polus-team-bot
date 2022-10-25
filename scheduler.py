@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 from aiogram import Bot
 
@@ -30,12 +31,15 @@ async def meeting_notification():
                 'minute': int(meeting_doc['time'].split(":")[1].split(" ")[0])
             }
             current_date = datetime.now()
+            time.sleep(5)
+            print("Waiting")
             if meeting_date.year == current_date.year and \
                     meeting_date.month == current_date.month and \
                     meeting_date.day == current_date.day and \
                     meeting_time.get('hour') == current_date.hour and \
                     meeting_time.get('minute') == current_date.minute and not \
                     'notified' in meeting_doc.keys():
+                print("Notified")
 
                 members = []
 
