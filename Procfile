@@ -1,2 +1,1 @@
-web: python run.py
-worker: python scheduler.py
+web: python run.py & python scheduler.py
