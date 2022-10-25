@@ -3,7 +3,7 @@ import time
 
 from aiogram import Bot
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from tgbot.models.db import Database
 from tgbot.config import load_config
@@ -30,9 +30,7 @@ async def meeting_notification():
                 'hour': int(meeting_doc['time'].split(":")[0]),
                 'minute': int(meeting_doc['time'].split(":")[1].split(" ")[0])
             }
-            current_date = datetime.now()
-            time.sleep(5)
-            print("Waiting")
+            current_date = datetime.now() + timedelta(hours=3)
             if meeting_date.year == current_date.year and \
                     meeting_date.month == current_date.month and \
                     meeting_date.day == current_date.day and \
