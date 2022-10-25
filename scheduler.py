@@ -70,7 +70,7 @@ async def meeting_notification():
                           f'⏰ Time: {meeting_doc["time"]}\n\n' \
                           f'👥 Members: \n{members}'
 
-                msg = await bot.send_message(chat_id=config.tg_bot.test_chat,
+                msg = await bot.send_message(chat_id=config.tg_bot.dev_chat,
                                              text=meeting,
                                              reply_markup=meeting_checkin(meeting_doc))
 
@@ -81,7 +81,7 @@ async def meeting_notification():
                              search={'_id': meeting_doc['_id']},
                              update_doc=meeting_doc)
 
-                await bot.pin_chat_message(chat_id=config.tg_bot.test_chat,
+                await bot.pin_chat_message(chat_id=config.tg_bot.dev_chat,
                                            message_id=msg.message_id)
 
 
