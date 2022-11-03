@@ -5,7 +5,7 @@ from app import app
 from aiogram import types, Dispatcher, Bot
 import botwebhook as polus_team_bot
 
-from tgbot.handlers.jira import add_task, start_task, end_task
+from tgbot.handlers.jira import add_task, start_task, end_task, comment_task
 
 asyncio.run(polus_team_bot.on_startup(polus_team_bot.dp))
 
@@ -33,4 +33,6 @@ async def jira_hook():
         await start_task(polus_team_bot.bot, request.json)
     elif request.headers.get('Action') == "end-task":
         await end_task(polus_team_bot.bot, request.json)
+    elif request.headers.get('Action') == "comment-task":
+        await comment_task(polus_team_bot.bot, request.json)
     return Response('ok', status=200)

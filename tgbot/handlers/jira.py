@@ -156,39 +156,33 @@ async def end_task(bot: Bot, data: dict):
     )
 
 
-# async def end_task(bot: Bot, data: dict):
-#
-#     print(data['issue']['fields']['assignee']['accountId'], data['issue']['fields']['creator']['accountId'])
-#
-#     creator = db.getDoc(
-#         database='polus',
-#         collection='user',
-#         search={
-#             'jira_id': data['issue']['fields']['creator']['accountId']
-#         }
-#     )
-#     worker = db.getDoc(
-#         database='polus',
-#         collection='user',
-#         search={
-#             'jira_id': data['issue']['fields']['assignee']['accountId']
-#         }
-#     )
-#     task_code = data['issue']['key']
-#     project = data['issue']['fields']['project']['name']
-#     task_name = data['issue']['fields']['summary']
-#     task = db.getDoc(
-#         database='polus',
-#         collection='tasks',
-#         search={
-#             'code': task_code
-#         }
-#     )
-#
-#     task['active'] = False
-#     db.updateDoc(
-#         database='polus',
-#         collection='tasks',
-#         search={'_id': task['_id']},
-#         update_doc=task
-#     )
+async def comment_task(bot: Bot, data: dict):
+
+    print(data['issue']['fields']['assignee']['accountId'], data['issue']['fields']['creator']['accountId'])
+
+    task_code = data['issue']['key']
+    comment = data['issue']['fields']['description']
+    task = db.getDoc(
+        database='polus',
+        collection='tasks',
+        search={
+            'code': task_code
+        }
+    )
+    worker = db.getDoc(
+        database='polus',
+        collection='user',
+        search={
+            'telegram_id': task['worker']
+        }
+    )
+
+    message = f"✏️ NEW COMMENT ✏️\n\n" \
+              f"📄 Task: {task['code']} {task['name']} ({task['project']})\n" \
+              f"👤 @{worker['username']}\n\n" \
+              f'"{comment}"'
+
+    await bot.send_message(
+        chat_id=bot['config'].tg_bot.test_chat,
+        text=message
+    )
