@@ -30,7 +30,6 @@ async def meeting_notification():
                 'hour': int(meeting_doc['time'].split(":")[0]),
                 'minute': int(meeting_doc['time'].split(":")[1].split(" ")[0])
             }
-            print("Waiting")
             current_date = datetime.now() + timedelta(hours=3)
             if meeting_date.year == current_date.year and \
                     meeting_date.month == current_date.month and \
