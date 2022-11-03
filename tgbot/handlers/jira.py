@@ -206,10 +206,10 @@ async def status_task(bot: Bot, data: dict):
             'telegram_id': task['worker']
         }
     )
-    if status == "Готово":
+    if status in ["Готово", "Done"]:
         message = f"<strong>🎉️ TASK DONE 🎉️</strong>\n\n" \
                   f"📄 Task: {task['code']} {task['name']} ({task['project']})\n" \
-                  f"Congrats!"
+                  f"<code>Congrats @{worker['username']}!</code>"
     else:
         message = f"<strong>❕ TASK STATUS CHANGED</strong>\n\n" \
                   f"📄 Task: {task['code']} {task['name']} ({task['project']})\n" \
