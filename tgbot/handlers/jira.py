@@ -177,10 +177,43 @@ async def comment_task(bot: Bot, data: dict):
         }
     )
 
-    message = f"✏️ NEW COMMENT ✏️\n\n" \
+    message = f"<strong>✏️ NEW COMMENT</strong>\n\n" \
               f"📄 Task: {task['code']} {task['name']} ({task['project']})\n" \
               f"👤 @{worker['username']}\n\n" \
-              f'"{comment}"'
+              f"{comment}"
+
+    await bot.send_message(
+        chat_id=bot['config'].tg_bot.dev_chat,
+        text=message
+    )
+
+
+async def status_task(bot: Bot, data: dict):
+
+    task_code = data['issue']['key']
+    status = data['issue']['fields']['status']['name']
+    task = db.getDoc(
+        database='polus',
+        collection='tasks',
+        search={
+            'code': task_code
+        }
+    )
+    worker = db.getDoc(
+        database='polus',
+        collection='user',
+        search={
+            'telegram_id': task['worker']
+        }
+    )
+    if status == "Готово":
+        message = f"<strong>🎉️ TASK DONE 🎉️</strong>\n\n" \
+                  f"📄 Task: {task['code']} {task['name']} ({task['project']})\n" \
+                  f"Congrats!"
+    else:
+        message = f"<strong>❕ TASK STATUS CHANGED</strong>\n\n" \
+                  f"📄 Task: {task['code']} {task['name']} ({task['project']})\n" \
+                  f"〽️ Status: {status}"
 
     await bot.send_message(
         chat_id=bot['config'].tg_bot.test_chat,
