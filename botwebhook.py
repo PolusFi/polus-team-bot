@@ -17,7 +17,7 @@ from tgbot.middlewares.environment import EnvironmentMiddleware
 logger = logging.getLogger(__name__)
 config = load_config(".env")
 
-WEBHOOK_PATH = f"bot/{config.tg_bot.token}"
+WEBHOOK_PATH = f"/bot/{config.tg_bot.token}"
 WEBHOOK_URL = config.tg_bot.webhook_url + WEBHOOK_PATH
 
 
