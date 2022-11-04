@@ -77,7 +77,68 @@ async def add_task(bot: Bot, data: dict):
             chat_id=bot['config'].tg_bot.dev_chat,
             text=message
         )
-    print(creator['username'], worker['username'], task_code, project, project_name, task_name, sp, deadline_obj)
+
+
+async def update_task(bot: Bot, data: dict):
+
+    creator = db.getDoc(
+        database='polus',
+        collection='user',
+        search={
+            'jira_id': data['issue']['fields']['creator']['accountId']
+        }
+    )
+    worker = db.getDoc(
+        database='polus',
+        collection='user',
+        search={
+            'jira_id':
+                data['issue']['fields']['assignee']['accountId']
+        }
+    )
+
+    task_code = data['issue']['key']
+    task_name = data['issue']['fields']['summary']
+
+    try:
+        project_name = data['issue']['fields']['parent']['fields']['summary']
+    except:
+        project_name = '-'
+
+    try:
+        deadline = data['issue']['fields']['duedate'].split("-")
+        deadline_obj = datetime.datetime(int(deadline[0]), int(deadline[1]), int(deadline[2]))
+    except:
+        deadline_obj = datetime.datetime.now()
+    try:
+        sp = int(data['issue']['fields']['customfield_10016'])
+    except:
+        sp = 1
+
+    task_doc = db.getDoc(
+        database='polus',
+        collection='tasks',
+        search={
+            'code': task_code
+        })
+
+    if task_doc:
+        task_doc["name"] = task_name
+        task_doc["code"] = task_code
+        task_doc["project"] = project_name
+        task_doc["story_point"] = sp
+        task_doc["deadline"] = deadline_obj
+        task_doc["worker"] = worker['telegram_id']
+        task_doc["creator"] = creator['telegram_id']
+
+        db.updateDoc(
+            database='polus',
+            collection='tasks',
+            search={'_id': task_doc['_id']},
+            update_doc=task_doc
+        )
+    else:
+        add_task(bot, data)
 
 
 async def start_task(bot: Bot, data: dict):
