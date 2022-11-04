@@ -209,13 +209,13 @@ async def status_task(bot: Bot, data: dict):
     if status in ["Готово", "Done"]:
         message = f"<strong>🎉️ TASK DONE 🎉️</strong>\n\n" \
                   f"📄 Task: {task['code']} {task['name']} ({task['project']})\n" \
-                  f"<code>Congrats @{worker['username']}!</code>"
+                  f"<code>Congrats</code> @{worker['username']}!"
     else:
         message = f"<strong>❕ TASK STATUS CHANGED</strong>\n\n" \
                   f"📄 Task: {task['code']} {task['name']} ({task['project']})\n" \
                   f"〽️ Status: {status}"
 
     await bot.send_message(
-        chat_id=bot['config'].tg_bot.test_chat,
+        chat_id=bot['config'].tg_bot.dev_chat,
         text=message
     )
