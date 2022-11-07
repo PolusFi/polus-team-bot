@@ -114,8 +114,7 @@ async def meeting_notification():
                           f'👥 Members: \n{members}'
 
                 await bot.send_message(chat_id=config.tg_bot.dev_chat,
-                                       text=meeting,
-                                       reply_markup=meeting_checkin(meeting_doc))
+                                       text=meeting)
 
                 meeting_doc['notified_5'] = True
                 db.updateDoc(database='polus',
