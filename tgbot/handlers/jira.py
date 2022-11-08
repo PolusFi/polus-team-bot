@@ -272,7 +272,7 @@ async def status_task(bot: Bot, data: dict):
                   f"📄 Task: {task['code']} {task['name']} ({task['project']})\n" \
                   f"<code>Congrats</code> @{worker['username']}!"
     else:
-        message = f"<strong>❕ TASK STATUS CHANGED</strong>\n\n" \
+        message = f"<strong>💡 TASK STATUS CHANGED</strong>\n\n" \
                   f"📄 Task: {task['code']} {task['name']} ({task['project']})\n" \
                   f"〽️ Status: {status}"
 
