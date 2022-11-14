@@ -30,7 +30,7 @@ async def meeting_notification():
                 'hour': int(meeting_doc['time'].split(":")[0]),
                 'minute': int(meeting_doc['time'].split(":")[1].split(" ")[0])
             }
-            current_date = datetime.now() + timedelta(hours=3, minutes=30)
+            current_date = datetime.now() + timedelta(hours=3, minutes=20)
             current_date_5 = datetime.now() + timedelta(hours=3, minutes=5)
             if meeting_date.year == current_date.year and \
                     meeting_date.month == current_date.month and \
@@ -122,6 +122,7 @@ async def meeting_notification():
                              search={'_id': meeting_doc['_id']},
                              update_doc=meeting_doc)
         time.sleep(60)
+        print("Waiting for announcement")
 
 
 if __name__ == '__main__':
