@@ -47,7 +47,8 @@ async def add_task(bot: Bot, data: dict):
         message = f"📃 <strong>NEW TASK ADDED</strong>\n\n" \
                   f"📁 Project: <strong>{data['project']}</strong>\n" \
                   f"🔖 Task: {data['emoji']} <strong><a href='{data['url']}'>{data['name']}</a></strong>\n" \
-                  f"👤 User: <strong>@{worker['username']}</strong> ({data['person_name']})\n\n" \
+                  f"👤 User: <strong>@{worker['username']}</strong> ({data['person_name']})\n" \
+                  f"{('💅 Description: ' + data['description']) if data.get('description') else ''}\n" \
                   f"📈 Deadline: <strong>{deadline_obj.strftime('%d/%m/%Y')}</strong>"
         data['id'] = db.addDoc(database='polus', collection='tasks', document=task_doc)
         await bot.send_message(
