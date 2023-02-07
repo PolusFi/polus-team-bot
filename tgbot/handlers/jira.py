@@ -46,7 +46,7 @@ async def add_task(bot: Bot, data: dict):
         }
         message = f"📃 <strong>NEW TASK ADDED</strong>\n\n" \
                   f"📁 Project: <strong>{data['project']}</strong>\n" \
-                  f"🔖 Task: {data['emoji']} <strong><a href='{data['url']}'>{data['name']}</a></strong>\n" \
+                  f"🔖 Task: {data['emoji'] if data.get('emoji') else ''} <strong><a href='{data['url']}'>{data['name']}</a></strong>\n" \
                   f"👤 User: <strong>@{worker['username']}</strong> ({data['person_name']})\n" \
                   f"{('💅 Description: ' + data['description']) if data.get('description') else ''}\n" \
                   f"📈 Deadline: <strong>{deadline_obj.strftime('%d/%m/%Y')}</strong>"
