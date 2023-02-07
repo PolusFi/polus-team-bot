@@ -34,11 +34,10 @@ async def add_task(bot: Bot, data: dict):
             deadline_obj = datetime.datetime.date(data['created_time'])
         except:
             deadline_obj = datetime.datetime.now()
-
+        print(deadline_obj)
         task_doc = {
             "name": data['name'],
             "project": data['project'],
-            "story_point": sp,
             "deadline": deadline_obj,
             "status": True,
             "worker": worker['telegram_id'],
@@ -49,7 +48,6 @@ async def add_task(bot: Bot, data: dict):
                   f"📁 Project: <strong>{data['project']}</strong>\n" \
                   f"🔖 Task: {data['emoji']} <strong><a href='{data['url']}'>{data['name']}</a></strong>\n" \
                   f"👤 User: <strong>@{worker['username']}</strong> ({data['person_name']})\n\n" \
-                  f"💈 Story point: <strong>{sp}</strong>\n" \
                   f"📈 Deadline: <strong>{deadline_obj.strftime('%d/%m/%Y')}</strong>"
         data['id'] = db.addDoc(database='polus', collection='tasks', document=task_doc)
         await bot.send_message(
