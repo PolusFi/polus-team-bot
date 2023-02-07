@@ -27,10 +27,10 @@ async def bot_hook():
     return Response('ok', status=200)
 
 
-@app.route("/jira", methods=['POST'])
+@app.route("/action", methods=['POST'])
 async def jira_hook():
     print(request.headers.get('Action'))
-    if request.headers.get('Action') == "new-task":
+    if request.json.get('action') == "new-task":
         await add_task(polus_team_bot.bot, request.json)
     elif request.headers.get('Action') == "started-task":
         await add_task(polus_team_bot.bot, request.json)

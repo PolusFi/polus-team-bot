@@ -12,24 +12,23 @@ db.create()
 
 async def add_task(bot: Bot, data: dict):
 
-    print(data['issue']['fields']['assignee']['accountId'], data['issue']['fields']['creator']['accountId'])
+    print(data)
 
     creator = db.getDoc(
         database='polus',
         collection='user',
         search={
-            'jira_id': data['issue']['fields']['creator']['accountId']
+            'email': data['creator_email']
         }
     )
     worker = db.getDoc(
         database='polus',
         collection='user',
         search={
-            'jira_id':
-                data['issue']['fields']['assignee']['accountId']
+            'email': data['person_email']
         }
     )
-    task_code = data['issue']['key']
+    # task_code = data['issue']['key']
     project = data['issue']['fields']['project']['name']
     task_name = data['issue']['fields']['summary']
     try:
