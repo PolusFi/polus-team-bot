@@ -29,17 +29,17 @@ async def add_task(bot: Bot, data: dict):
             }
         )
 
-        try:
-            # deadline = data['issue']['fields']['duedate'].split("-")
-            deadline_obj = datetime.datetime.date(data['created_time'])
-        except Exception as e:
-            print(e)
-            deadline_obj = datetime.datetime.now()
-        print(deadline_obj)
+        # try:
+        #     # deadline = data['issue']['fields']['duedate'].split("-")
+        #     deadline_obj = datetime.datetime.date(data['created_time'])
+        # except Exception as e:
+        #     print(e)
+        #     deadline_obj = datetime.datetime.now()
+        # print(deadline_obj)
         task_doc = {
-            "name": data['name'],
-            "project": data['project'],
-            "deadline": deadline_obj,
+            "name": data.get('name'),
+            "project": data.get('project'),
+            "deadline": data.get('deadline'),
             "status": True,
             "worker": worker['telegram_id'],
             "creator": creator['telegram_id'],
@@ -50,7 +50,7 @@ async def add_task(bot: Bot, data: dict):
                   f"🔖 Task: {data['emoji'] if data.get('emoji') else ''} <strong><a href='{data['url']}'>{data['name']}</a></strong>\n" \
                   f"👤 User: <strong>@{worker['username']}</strong> ({data['person_name']})\n" \
                   f"{('💅 Description: ' + data['description']) if data.get('description') else ''}\n" \
-                  f"📈 Deadline: <strong>{deadline_obj.strftime('%d/%m/%Y')}</strong>"
+                  f"📈 Deadline: <strong>{data.get('deadline')}</strong>"
         data['id'] = db.addDoc(database='polus', collection='tasks', document=task_doc)
         await bot.send_message(
             chat_id=bot['config'].tg_bot.dev_chat,
