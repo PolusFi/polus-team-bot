@@ -29,16 +29,16 @@ async def add_task(bot: Bot, data: dict):
         }
     )
     # task_code = data['issue']['key']
-    project = data['issue']['fields']['project']['name']
-    task_name = data['issue']['fields']['summary']
-    try:
-        project_name = data['issue']['fields']['parent']['fields']['summary']
-    except:
-        project_name = '-'
+    # project = data['issue']['fields']['project']['name']
+    # task_name = data['issue']['fields']['summary']
+    # try:
+    #     project_name = data['issue']['fields']['parent']['fields']['summary']
+    # except:
+    #     project_name = '-'
 
     try:
-        deadline = data['issue']['fields']['duedate'].split("-")
-        deadline_obj = datetime.datetime(int(deadline[0]), int(deadline[1]), int(deadline[2]))
+        # deadline = data['issue']['fields']['duedate'].split("-")
+        deadline_obj = datetime.datetime.date(data['created_time'])
     except:
         deadline_obj = datetime.datetime.now()
     try:
@@ -46,36 +46,36 @@ async def add_task(bot: Bot, data: dict):
     except:
         sp = 1
 
-    task_doc = db.getDoc(
-        database='polus',
-        collection='tasks',
-        search={
-            'code': task_code
-        })
+    # task_doc = db.getDoc(
+    #     database='polus',
+    #     collection='tasks',
+    #     search={
+    #         'code': task_code
+    #     })
 
-    if not task_doc:
-        task_doc = {
-            "name": task_name,
-            "code": task_code,
-            "project": project_name,
-            "story_point": sp,
-            "deadline": deadline_obj,
-            "status": True,
-            "worker": worker['telegram_id'],
-            "creator": creator['telegram_id'],
-            "active": False
-        }
-        message = f"📃 <strong>NEW TASK ADDED</strong>\n\n" \
-                  f"📁 Project: <strong>{project} ({project_name})</strong>\n" \
-                  f"🔖 Task: <strong>{task_code} {task_name}</strong>\n" \
-                  f"👤 User: <strong>@{worker['username']}</strong>\n\n" \
-                  f"💈 Story point: <strong>{sp}</strong>\n" \
-                  f"📈 Deadline: <strong>{deadline_obj.strftime('%d/%m/%Y')}</strong>"
-        data['id'] = db.addDoc(database='polus', collection='tasks', document=task_doc)
-        await bot.send_message(
-            chat_id=bot['config'].tg_bot.dev_chat,
-            text=message
-        )
+    # if not task_doc:
+    task_doc = {
+        "name": data['name'],
+        "code": "",
+        "project": data['project'],
+        "story_point": sp,
+        "deadline": deadline_obj,
+        "status": True,
+        "worker": worker['telegram_id'],
+        "creator": creator['telegram_id'],
+        "active": False
+    }
+    message = f"📃 <strong>NEW TASK ADDED</strong>\n\n" \
+              f"📁 Project: <strong>{data['project']}</strong>\n" \
+              f"🔖 Task: {data['emoji']} <strong><a href='{data['url']}'>{data['name']}</a></strong>\n" \
+              f"👤 User: <strong>@{worker['username']}</strong>\n\n" \
+              f"💈 Story point: <strong>{sp}</strong>\n" \
+              f"📈 Deadline: <strong>{deadline_obj.strftime('%d/%m/%Y')}</strong>"
+    data['id'] = db.addDoc(database='polus', collection='tasks', document=task_doc)
+    await bot.send_message(
+        chat_id=bot['config'].tg_bot.dev_chat,
+        text=message
+    )
 
 
 async def update_task(bot: Bot, data: dict):
