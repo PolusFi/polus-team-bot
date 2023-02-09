@@ -32,7 +32,8 @@ async def meeting_notification():
             }
             current_date = datetime.now() + timedelta(hours=3, minutes=30)
             current_date_5 = datetime.now() + timedelta(hours=3, minutes=5)
-            hour, minute = tuple(meeting_doc["time"].split(":"))
+            hour = meeting_doc["time"].split(":")[0]
+            minute = meeting_doc["time"].split(":")[1]
             if meeting_date.year == current_date.year and \
                     meeting_date.month == current_date.month and \
                     meeting_date.day == current_date.day and \
