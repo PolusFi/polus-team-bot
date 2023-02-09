@@ -108,6 +108,7 @@ async def admin_notify_group(callback_query: CallbackQuery, callback_data: dict)
                      f'{int(hour)-1}:{minute} (Kyiv) | ' \
                      f'{int(hour)+1}:{minute} (Batumi) | ' \
                      f'{int(hour)+3}:{minute} (Almaty)\n\n'
+
         try:
             await callback_query.bot.send_message(chat_id=member['telegram_id'],
                                                   text=remind_msg,
