@@ -30,8 +30,9 @@ async def meeting_notification():
                 'hour': int(meeting_doc['time'].split(":")[0]),
                 'minute': int(meeting_doc['time'].split(":")[1].split(" ")[0])
             }
-            current_date = datetime.now() + timedelta(hours=3, minutes=20)
+            current_date = datetime.now() + timedelta(hours=3, minutes=30)
             current_date_5 = datetime.now() + timedelta(hours=3, minutes=5)
+            hour, minute = meeting_doc["time"].split(":")
             if meeting_date.year == current_date.year and \
                     meeting_date.month == current_date.month and \
                     meeting_date.day == current_date.day and \
@@ -55,7 +56,10 @@ async def meeting_notification():
                                  f'📄 Мит: {meeting_doc["name"]}\n\n' \
                                  f'📈 Цель: {meeting_doc["goal"]}\n\n' \
                                  f'📆 Дата: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
-                                 f'⏰ Время: {meeting_doc["time"]}\n\n'
+                                 f'⏰ Время: {hour}:{minute} (Istanbul) | ' \
+                                 f'{int(hour)-1}:{minute} (Kyiv) | ' \
+                                 f'{int(hour)+1}:{minute} (Batumi) | ' \
+                                 f'{int(hour)+3}:{minute} (Almaty)\n\n'
                     try:
                         await bot.send_message(chat_id=member['telegram_id'],
                                                text=remind_msg,
@@ -68,7 +72,10 @@ async def meeting_notification():
                 meeting = f'📄 Name: {meeting_doc["name"]}\n\n' \
                           f'📈 Object: {meeting_doc["goal"]}\n\n' \
                           f'📆 Date: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
-                          f'⏰ Time: {meeting_doc["time"]}\n\n' \
+                          f'⏰ Time: {hour}:{minute} (Istanbul) | ' \
+                          f'{int(hour)-1}:{minute} (Kyiv) | ' \
+                          f'{int(hour)+1}:{minute} (Batumi) | ' \
+                          f'{int(hour)+3}:{minute} (Almaty)\n\n' \
                           f'👥 Members: \n{members}'
 
                 msg = await bot.send_message(chat_id=config.tg_bot.dev_chat,
@@ -110,7 +117,10 @@ async def meeting_notification():
                           f'📄 Name: {meeting_doc["name"]}\n\n' \
                           f'📈 Object: {meeting_doc["goal"]}\n\n' \
                           f'📆 Date: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
-                          f'⏰ Time: {meeting_doc["time"]}\n\n' \
+                          f'⏰ Time: {hour}:{minute} (Istanbul) | ' \
+                          f'{int(hour)-1}:{minute} (Kyiv) | ' \
+                          f'{int(hour)+1}:{minute} (Batumi) | ' \
+                          f'{int(hour)+3}:{minute} (Almaty)\n\n' \
                           f'👥 Members: \n{members}'
 
                 await bot.send_message(chat_id=config.tg_bot.dev_chat,

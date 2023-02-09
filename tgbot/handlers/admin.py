@@ -99,12 +99,15 @@ async def admin_notify_group(callback_query: CallbackQuery, callback_data: dict)
                 )
             )
         )
-
+        hour, minute = meeting_doc["time"].split(":")
         remind_msg = f'❗️ {member["name"]}, скоро состоится мит с вашим участием, <strong>не</strong> забудьте прийти!\n\n' \
                      f'📄 Мит: {meeting_doc["name"]}\n\n' \
                      f'📈 Цель: {meeting_doc["goal"]}\n\n' \
                      f'📆 Дата: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
-                     f'⏰ Время: {meeting_doc["time"]}\n\n'
+                     f'⏰ Время: {hour}:{minute} (Istanbul) | ' \
+                     f'{int(hour)-1}:{minute} (Kyiv) | ' \
+                     f'{int(hour)+1}:{minute} (Batumi) | ' \
+                     f'{int(hour)+3}:{minute} (Almaty)\n\n'
         try:
             await callback_query.bot.send_message(chat_id=member['telegram_id'],
                                                   text=remind_msg,
