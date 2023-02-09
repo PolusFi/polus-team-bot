@@ -122,7 +122,10 @@ async def admin_notify_group(callback_query: CallbackQuery, callback_data: dict)
     meeting = f'📄 Name: {meeting_doc["name"]}\n\n' \
               f'📈 Object: {meeting_doc["goal"]}\n\n' \
               f'📆 Date: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
-              f'⏰ Time: {meeting_doc["time"]}\n\n' \
+              f'⏰ Time: {hour}:{minute} (Istanbul) | ' \
+              f'{int(hour)-1}:{minute} (Kyiv) | ' \
+              f'{int(hour)+1}:{minute} (Batumi) | ' \
+              f'{int(hour)+3}:{minute} (Almaty)\n\n' \
               f'👥 Members: \n{members}'
 
     msg = await callback_query.bot.send_message(chat_id=callback_query.bot['config'].tg_bot.dev_chat,
