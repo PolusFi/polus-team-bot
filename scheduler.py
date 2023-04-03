@@ -58,7 +58,7 @@ async def meeting_notification():
                                  f'📈 Цель: {meeting_doc["goal"]}\n\n' \
                                  f'📆 Дата: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
                                  f'⏰ Время: {hour}:{minute} (Istanbul) | ' \
-                                 f'{int(hour)-1}:{minute} (Kyiv) | ' \
+                                 f'{int(hour)}:{minute} (Kyiv) | ' \
                                  f'{int(hour)+1}:{minute} (Batumi) | ' \
                                  f'{int(hour)+3}:{minute} (Almaty)\n\n'
                     try:
@@ -74,7 +74,7 @@ async def meeting_notification():
                           f'📈 Object: {meeting_doc["goal"]}\n\n' \
                           f'📆 Date: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
                           f'⏰ Time: {hour}:{minute} (Istanbul) | ' \
-                          f'{int(hour)-1}:{minute} (Kyiv) | ' \
+                          f'{int(hour)}:{minute} (Kyiv) | ' \
                           f'{int(hour)+1}:{minute} (Batumi) | ' \
                           f'{int(hour)+3}:{minute} (Almaty)\n\n' \
                           f'👥 Members: \n{members}'
@@ -119,7 +119,7 @@ async def meeting_notification():
                           f'📈 Object: {meeting_doc["goal"]}\n\n' \
                           f'📆 Date: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
                           f'⏰ Time: {hour}:{minute} (Istanbul) | ' \
-                          f'{int(hour)-1}:{minute} (Kyiv) | ' \
+                          f'{int(hour)}:{minute} (Kyiv) | ' \
                           f'{int(hour)+1}:{minute} (Batumi) | ' \
                           f'{int(hour)+3}:{minute} (Almaty)\n\n' \
                           f'👥 Members: \n{members}'
