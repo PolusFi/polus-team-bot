@@ -44,7 +44,7 @@ def format_meeting_text(meeting_doc: dict):
               f'Kyiv: {int(hour)}:{minute} ({hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
               f'Batumi: {int(hour)+1}:{minute} ({(hour+1) % 12}:{minute} {"PM" if (hour+1) > 12 else "AM"})\n' \
               f'Almaty: {int(hour)+3}:{minute} ({(hour+3) % 12}:{minute} {"PM" if (hour+3) > 12 else "AM"})\n' \
-              f'EST: {int(hour)-8}:{minute} ({(int(hour)-8) % 12}:{minute} {"PM" if (hour-8) > 12 else "AM"})\n\n'
+              f'EST: {int(hour)-8}:{minute} ({(int(hour)-8) % 12}:{minute} {"PM" if (hour-8) > 12 else "AM"})\n\n' \
               f'👥 Members: \n{members}'
 
     return meeting
