@@ -58,11 +58,11 @@ async def meeting_notification():
                                  f'📈 Цель: {meeting_doc["goal"]}\n\n' \
                                  f'📆 Дата: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
                                  f'⏰ Время:\n' \
-                                 f'Istanbul: {0 if int(hour) < 10}{int(hour)}:{minute} ({0 if int(hour) < 10}{hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
-                                 f'Kyiv: {0 if int(hour) < 10}{int(hour)}:{minute} ({0 if int(hour) < 10}{hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
-                                 f'Batumi: {0 if int(hour)+1 < 10}{int(hour)+1}:{minute} ({0 if int(hour)+1 < 10}{(hour+1) % 12}:{minute} {"PM" if (hour+1) > 12 else "AM"})\n' \
-                                 f'Almaty: {0 if int(hour)+3 < 10}{int(hour)+3}:{minute} ({0 if int(hour)+3 < 10}{(hour+3) % 12}:{minute} {"PM" if (hour+3) > 12 else "AM"})\n' \
-                                 f'EST: {0 if int(hour)-7 < 10}{int(hour)-7}:{minute} ({0 if int(hour)-7 < 10}{(int(hour)-7) % 12}:{minute} {"PM" if (hour-7) > 12 else "AM"})\n\n'
+                                 f'Istanbul: {0 if int(hour) < 10 else ""}{int(hour)}:{minute} ({0 if int(hour) < 10 else ""}{hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
+                                 f'Kyiv: {0 if int(hour) < 10 else ""}{int(hour)}:{minute} ({0 if int(hour) < 10 else ""}{hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
+                                 f'Batumi: {0 if int(hour)+1 < 10 else ""}{int(hour)+1}:{minute} ({0 if int(hour)+1 < 10 else ""}{(hour+1) % 12}:{minute} {"PM" if (hour+1) > 12 else "AM"})\n' \
+                                 f'Almaty: {0 if int(hour)+3 < 10 else ""}{int(hour)+3}:{minute} ({0 if int(hour)+3 < 10 else ""}{(hour+3) % 12}:{minute} {"PM" if (hour+3) > 12 else "AM"})\n' \
+                                 f'EST: {0 if int(hour)-7 < 10 else ""}{int(hour)-7}:{minute} ({0 if int(hour)-7 < 10 else ""}{(int(hour)-7) % 12}:{minute} {"PM" if (hour-7) > 12 else "AM"})\n\n'
                     try:
                         await bot.send_message(chat_id=member['telegram_id'],
                                                text=remind_msg,
@@ -76,11 +76,11 @@ async def meeting_notification():
                           f'📈 Object: {meeting_doc["goal"]}\n\n' \
                           f'📆 Date: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
                           f'⏰ Time:\n' \
-                          f'Istanbul: {0 if int(hour) < 10}{int(hour)}:{minute} ({0 if int(hour) < 10}{hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
-                          f'Kyiv: {0 if int(hour) < 10}{int(hour)}:{minute} ({0 if int(hour) < 10}{hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
-                          f'Batumi: {0 if int(hour)+1 < 10}{int(hour)+1}:{minute} ({0 if int(hour)+1 < 10}{(hour+1) % 12}:{minute} {"PM" if (hour+1) > 12 else "AM"})\n' \
-                          f'Almaty: {0 if int(hour)+3 < 10}{int(hour)+3}:{minute} ({0 if int(hour)+3 < 10}{(hour+3) % 12}:{minute} {"PM" if (hour+3) > 12 else "AM"})\n' \
-                          f'EST: {0 if int(hour)-7 < 10}{int(hour)-7}:{minute} ({0 if int(hour)-7 < 10}{(int(hour)-7) % 12}:{minute} {"PM" if (hour-7) > 12 else "AM"})\n\n' \
+                          f'Istanbul: {0 if int(hour) < 10 else ""}{int(hour)}:{minute} ({0 if int(hour) < 10 else ""}{hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
+                          f'Kyiv: {0 if int(hour) < 10 else ""}{int(hour)}:{minute} ({0 if int(hour) < 10 else ""}{hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
+                          f'Batumi: {0 if int(hour)+1 < 10 else ""}{int(hour)+1}:{minute} ({0 if int(hour)+1 < 10 else ""}{(hour+1) % 12}:{minute} {"PM" if (hour+1) > 12 else "AM"})\n' \
+                          f'Almaty: {0 if int(hour)+3 < 10 else ""}{int(hour)+3}:{minute} ({0 if int(hour)+3 < 10 else ""}{(hour+3) % 12}:{minute} {"PM" if (hour+3) > 12 else "AM"})\n' \
+                          f'EST: {0 if int(hour)-7 < 10 else ""}{int(hour)-7}:{minute} ({0 if int(hour)-7 < 10 else ""}{(int(hour)-7) % 12}:{minute} {"PM" if (hour-7) > 12 else "AM"})\n\n' \
                           f'👥 Members: \n{members}'
 
                 msg = await bot.send_message(chat_id=config.tg_bot.dev_chat,
@@ -123,11 +123,11 @@ async def meeting_notification():
                           f'📈 Object: {meeting_doc["goal"]}\n\n' \
                           f'📆 Date: {meeting_doc["date"].strftime("%d/%m/%Y")}\n' \
                           f'⏰ Time:\n' \
-                          f'Istanbul: {0 if int(hour) < 10}{int(hour)}:{minute} ({0 if int(hour) < 10}{hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
-                          f'Kyiv: {0 if int(hour) < 10}{int(hour)}:{minute} ({0 if int(hour) < 10}{hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
-                          f'Batumi: {0 if int(hour)+1 < 10}{int(hour)+1}:{minute} ({0 if int(hour)+1 < 10}{(hour+1) % 12}:{minute} {"PM" if (hour+1) > 12 else "AM"})\n' \
-                          f'Almaty: {0 if int(hour)+3 < 10}{int(hour)+3}:{minute} ({0 if int(hour)+3 < 10}{(hour+3) % 12}:{minute} {"PM" if (hour+3) > 12 else "AM"})\n' \
-                          f'EST: {0 if int(hour)-7 < 10}{int(hour)-7}:{minute} ({0 if int(hour)-7 < 10}{(int(hour)-7) % 12}:{minute} {"PM" if (hour-7) > 12 else "AM"})\n\n' \
+                          f'Istanbul: {0 if int(hour) < 10 else ""}{int(hour)}:{minute} ({0 if int(hour) < 10 else ""}{hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
+                          f'Kyiv: {0 if int(hour) < 10 else ""}{int(hour)}:{minute} ({0 if int(hour) < 10 else ""}{hour % 12}:{minute} {"PM" if hour > 12 else "AM"})\n' \
+                          f'Batumi: {0 if int(hour)+1 < 10 else ""}{int(hour)+1}:{minute} ({0 if int(hour)+1 < 10 else ""}{(hour+1) % 12}:{minute} {"PM" if (hour+1) > 12 else "AM"})\n' \
+                          f'Almaty: {0 if int(hour)+3 < 10 else ""}{int(hour)+3}:{minute} ({0 if int(hour)+3 < 10 else ""}{(hour+3) % 12}:{minute} {"PM" if (hour+3) > 12 else "AM"})\n' \
+                          f'EST: {0 if int(hour)-7 < 10 else ""}{int(hour)-7}:{minute} ({0 if int(hour)-7 < 10 else ""}{(int(hour)-7) % 12}:{minute} {"PM" if (hour-7) > 12 else "AM"})\n\n' \
                           f'👥 Members: \n{members}'
 
                 await bot.send_message(chat_id=config.tg_bot.dev_chat,
