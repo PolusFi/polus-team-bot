@@ -31,7 +31,7 @@ def format_meeting_text(meeting_doc: dict):
             )
         )
 
-    hour = int(meeting_doc["time"].split(":")[0]0
+    hour = int(meeting_doc["time"].split(":")[0])
     minute = meeting_doc["time"].split(":")[1]
 
     members = "\n".join(members)
