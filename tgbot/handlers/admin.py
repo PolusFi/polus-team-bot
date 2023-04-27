@@ -99,8 +99,8 @@ async def admin_notify_group(callback_query: CallbackQuery, callback_data: dict)
                 )
             )
         )
-        hour = meeting_doc["time"].split(":")[0]
-        minute = meeting_doc["time"].split(":")[1]
+        hour = int(meeting_doc["time"].split(":")[0])
+        minute = int(meeting_doc["time"].split(":")[1])
         remind_msg = f'❗️ {member["name"]}, скоро состоится мит с вашим участием, <strong>не</strong> забудьте прийти!\n\n' \
                      f'📄 Мит: {meeting_doc["name"]}\n\n' \
                      f'📈 Цель: {meeting_doc["goal"]}\n\n' \
