@@ -30,4 +30,4 @@ RUN chown -R app:app ./* && chmod -R 777 ./*
 
 USER app
 
-ENTRYPOINT ['/bin/entrypoint.sh']
+ENTRYPOINT ['python', 'run.py', '&', 'python scheduler.py']
